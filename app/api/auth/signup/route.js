@@ -1,26 +1,43 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+export const runtime = 'nodejs';
 
 export async function POST(req) {
-  const { name, email, password } = await req.json();
+  try {
+    const { name, email, password } = await req.json();
 
-  // Check if user already exists
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    return new Response(JSON.stringify({ error: 'Email already exists' }), {
-      status: 400,
+    if (!name || !email || !password) {
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return new Response(JSON.stringify({ error: 'Email already registered' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { name, email, password: hashed },
+      select: { id: true, name: true, email: true },
+    });
+
+    return new Response(JSON.stringify(user), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.error('POST /api/auth/signup error:', err);
+    return new Response(JSON.stringify({ error: 'Failed to sign up' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
     });
   }
-
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Create user
-  await prisma.user.create({
-    data: { name, email, password: hashedPassword },
-  });
-
-  return new Response(JSON.stringify({ message: 'User created' }), { status: 201 });
 }
+

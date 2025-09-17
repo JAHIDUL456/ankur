@@ -1,10 +1,11 @@
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
 }
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,8 +14,8 @@ model User {
   email     String    @unique
   password  String
   role      Role      @default(USER)
-  bookings  Booking[]
   createdAt DateTime  @default(now())
+  bookings  Booking[]
 }
 
 model Event {
@@ -25,20 +26,24 @@ model Event {
   venue       String
   price       Float
   seats       Int
-  bookings    Booking[]
   createdAt   DateTime  @default(now())
+  bookings    Booking[]
 }
 
 model Booking {
   id        Int      @id @default(autoincrement())
   userId    Int
   eventId   Int
+  quantity  Int      @default(1)
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
   event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, eventId])
 }
 
 enum Role {
   USER
   ADMIN
 }
+

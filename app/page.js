@@ -8,27 +8,40 @@ export default function HomePage() {
   const router = useRouter();
 
   if (session) {
-    router.push('/dashboard'); // redirect logged-in users
+    router.push('/dashboard'); 
     return null;
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-bold">Welcome to Event Booking</h1>
-      <div className="flex gap-4">
-        <button
-          onClick={() => router.push('/auth/signin')}
-          className="px-6 py-2 bg-blue-500 text-white rounded"
-        >
-          Sign In
-        </button>
-        <button
-          onClick={() => router.push('/events')}
-          className="px-6 py-2 bg-green-500 text-white rounded"
-        >
-          Event List
-        </button>
+    <div className="relative min-h-[100svh] overflow-hidden bg-gradient-to-b from-white to-slate-50">
+      
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_65%)]"
+      >
+        <div className="absolute -top-24 left-1/2 h-[60vh] w-[80vw] -translate-x-1/2 rounded-full bg-[conic-gradient(at_top_left,var(--tw-gradient-stops))] from-sky-100 via-indigo-100 to-purple-100 blur-3xl" />
       </div>
+
+      <main className="mx-auto flex max-w-3xl flex-col items-center px-6 py-28 text-center sm:py-36">
+        <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+          Find and book events
+        </h1>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => router.push('/events')}
+            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-white shadow-sm transition hover:bg-black hover:shadow-md"
+          >
+            Browse events
+          </button>
+          <button
+            onClick={() => router.push('/auth/signin')}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-slate-900 transition hover:bg-slate-50"
+          >
+            Sign in
+          </button>
+        </div>
+      </main>
     </div>
   );
 }

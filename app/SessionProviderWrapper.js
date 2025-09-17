@@ -1,4 +1,4 @@
-"use client"; // <-- must be client component
+"use client"; 
 
 import { SessionProvider } from "next-auth/react";
 
